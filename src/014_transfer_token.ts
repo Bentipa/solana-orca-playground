@@ -1,7 +1,6 @@
-import { Keypair, Connection, PublicKey, Transaction } from "@solana/web3.js";
-import { TOKEN_PROGRAM_ID, Token, AccountLayout } from "@solana/spl-token";
 import { DecimalUtil, deriveATA, resolveOrCreateATA } from "@orca-so/common-sdk";
-import secret from "../wallet.json";
+import { AccountLayout, Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 
 const RPC_ENDPOINT_URL = "https://api.devnet.solana.com";
 const COMMITMENT = 'confirmed';

@@ -1,15 +1,9 @@
+import { getOrca, Network, OrcaPoolConfig } from "@orca-so/sdk";
 import {
-  Keypair,
-  Connection,
-  SystemProgram,
-  PublicKey,
-  Transaction,
-  LAMPORTS_PER_SOL,
+  Connection, Keypair
 } from "@solana/web3.js";
-import { getOrca, OrcaFarmConfig, OrcaPoolConfig, Network, OrcaU64, U64Utils, DecimalUtil } from "@orca-so/sdk";
-import secret from "../wallet.json";
 import Decimal from "decimal.js";
-import { BN } from "bn.js";
+import secret from "../wallet.json";
 
 
 export async function swapSolWithOrca(_solAmount, callback) {

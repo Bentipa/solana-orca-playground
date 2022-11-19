@@ -1,8 +1,8 @@
-import { transferTokenToPublicKey } from "./014_transfer_token";
-import { Keypair, Connection, PublicKey, Transaction } from "@solana/web3.js";
-import { swapSolWithOrca } from "./015_perform_swap";
-import casinoSecret from "../wallet.json";
+import { Keypair } from "@solana/web3.js";
 import * as fs from "fs";
+import casinoSecret from "../wallet.json";
+import { transferTokenToPublicKey } from "./014_transfer_token";
+import { swapSolWithOrca } from "./015_perform_swap";
 
 const readline = require("readline").createInterface({
   input: process.stdin,
