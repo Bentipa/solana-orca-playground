@@ -1,6 +1,6 @@
 import { transferTokenToPublicKey } from "./014_transfer_token";
 import { Keypair, Connection, PublicKey, Transaction } from "@solana/web3.js";
-import { swapSolWithSamo } from "./015_perform_swap";
+import { swapSolWithOrca } from "./015_perform_swap";
 import casinoSecret from "../wallet.json";
 import * as fs from "fs";
 
@@ -95,7 +95,7 @@ function launchExchange() {
         return;
       }
       try {
-        swapSolWithSamo(sol, () => {
+        swapSolWithOrca(sol, () => {
           console.log("Thanks for trading, let's play again...");
           playRound();
         });

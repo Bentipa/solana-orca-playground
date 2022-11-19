@@ -12,7 +12,7 @@ import Decimal from "decimal.js";
 import { BN } from "bn.js";
 
 
-export async function swapSolWithSamo(_solAmount, callback) {
+export async function swapSolWithOrca(_solAmount, callback) {
   // Initialize a connection to the RPC and read in private key
   const connection = new Connection("https://api.devnet.solana.com", "singleGossip");
   const orca = getOrca(connection, Network.DEVNET);
@@ -24,16 +24,16 @@ export async function swapSolWithSamo(_solAmount, callback) {
   const solToken = orcaSolPool.getTokenB();
   const solAmount = new Decimal(_solAmount as Decimal.Value);
   const quote = await orcaSolPool.getQuote(solToken, solAmount);
-  const samoAmount = quote.getMinOutputAmount();
+  const orcaAmount = quote.getMinOutputAmount();
 
   console.log(
-    `Swappin ${_solAmount.toString()} SOL for at least ${samoAmount.toNumber()} ORCA...`
+    `Swappin ${_solAmount.toString()} SOL for at least ${orcaAmount.toNumber()} ORCA...`
   );
   const swapPayload = await orcaSolPool.swap(
     keypair,
     solToken,
     solAmount,
-    samoAmount
+    orcaAmount
   );
   const swapTxId = await swapPayload.execute();
   console.log("Swapped:", swapTxId, "\n");
