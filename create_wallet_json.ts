@@ -1,7 +1,7 @@
 // create_wallet_json.ts
 import { bs58 } from "@project-serum/anchor/dist/cjs/utils/bytes";
 
-const wallet_json = "wallet.json";
+const wallet_json = "wallet2.json";
 
 const readline = require('readline').createInterface({
     input: process.stdin,

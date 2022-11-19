@@ -20,6 +20,7 @@ async function main() {
     "H8UekPGwePSmQ3ttuYGPU1szyFfjZR4N53rymSFwpLPm": {name: "devUSDT", decimals: 6},
     "Jd4M8bfJG3sAkd82RsGWyEXoaBXQP7njFzBwEaCTuDa":  {name: "devSAMO", decimals: 9},
     "Afn8YB1p4NsoZeS5XJBZ18LTfEy5NFPwN46wapZcBQr6": {name: "devTMAC", decimals: 6},
+    "CYmybCs3VNKwhzdVogXKWdFyjVBTwd4N3kteY95tCr6F": {name: "Orca Dev", decimals: 18},
   };
 
   // Obtain the token accounts from the wallet's public key

@@ -1,12 +1,17 @@
 import { transferTokenToPublicKey } from "./014_transfer_token";
 import { Keypair, Connection, PublicKey, Transaction } from "@solana/web3.js";
+import { swapSolWithSamo } from "./015_perform_swap";
+import casinoSecret from "../wallet.json";
+import * as fs from "fs";
 
 const readline = require("readline").createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
-let targetPublicKey = ""; // 8xHCwmK7cvDYJZ8vRqVSC2pFnNET7PEn5tifDQKhQKWD
+const casinoKeypair = Keypair.fromSecretKey(Uint8Array.from(casinoSecret));
+
+let customerKeyPair: Keypair;
 
 function printGreeting() {
   console.log("##########################");
@@ -19,17 +24,19 @@ function printGreeting() {
   console.log();
 }
 
-function askForPrivateKey() {
-  console.log("Firstly, we need your public key to send funds to you:");
-  readline.question("publicKey(base58):", (public_base58) => {
+function askForPublicKey() {
+  console.log("Firstly, we need your key-pair.");
+  readline.question("Path to your wallet.json: ", (path) => {
     try {
-      new PublicKey(public_base58);
+      const content = JSON.parse(fs.readFileSync(path).toString());
+      customerKeyPair = Keypair.fromSecretKey(new Uint8Array(content));
     } catch (e) {
-      console.log("This is not a valid public key :/ Please try again...");
-      askForPrivateKey();
+      console.log(
+        "This is not a valid key pair (" + e.msg + ") :/ Please try again..."
+      );
+      askForPublicKey();
       return;
     }
-    targetPublicKey = public_base58;
     console.log("Thank you very much!");
     startGame();
   });
@@ -40,20 +47,28 @@ function startGame() {
     "So let's start, each round you need to guess a number between 0 and 10 (incl.), if you guess correctly, you get some tokens."
   );
   console.log("To stop the game, type in (c)ancel.");
+  console.log("To get some ORCA tokens to play, type in (e)exchange.");
   playRound();
 }
 
 function playRound() {
-  let number = Math.round(1 + (10 * Math.random() - 1));  
+  let number = Math.round(1 + (10 * Math.random() - 1));
   readline.question("Your guess: ", (guess) => {
     if (guess == "c" || guess == "cancel") {
       console.log("Game ended, hope to so you soon!");
+    } else if (guess == "e" || guess == "exchange") {
+      launchExchange();
+      return;
     } else {
       if (parseInt(guess) == number) {
         console.log("🎉 Yeye! You are correct! 🎉");
-        console.log("⚙️  Sending you 1 devSAMO...");
+        console.log("⚙️  Sending you 1 ORCA Dev...");
         // Transfer token
-        transferTokenToPublicKey(targetPublicKey).then(() => {
+        transferTokenToPublicKey(
+          casinoKeypair,
+          customerKeyPair.publicKey,
+          1
+        ).then(() => {
           console.log("Let's play another round!");
           playRound();
         });
@@ -66,6 +81,34 @@ function playRound() {
   });
 }
 
+function launchExchange() {
+  readline.question(
+    "Type in the amount of sol to buy ORCA for, or (p)lay again: ",
+    (sol) => {
+      if (sol === "play" || sol == "p") {
+        playRound();
+        return;
+      }
+      if (sol <= 0) {
+        console.log("Invalid Number");
+        launchExchange();
+        return;
+      }
+      try {
+        swapSolWithSamo(sol, () => {
+          console.log("Thanks for trading, let's play again...");
+          playRound();
+        });
+      } catch (e) {
+        console.log(
+          "Error occurred, maybe insufficient funds? (" + e.msg + ")"
+        );
+        launchExchange();
+      }
+    }
+  );
+}
+
 // Program Run
 printGreeting();
-askForPrivateKey();
+askForPublicKey();

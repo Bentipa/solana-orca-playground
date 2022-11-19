@@ -6,58 +6,50 @@ import secret from "../wallet.json";
 const RPC_ENDPOINT_URL = "https://api.devnet.solana.com";
 const COMMITMENT = 'confirmed';
 
-export async function transferTokenToPublicKey(publicKey: String) {
+export async function transferTokenToPublicKey(src: Keypair, dest_pubkey: PublicKey, amount: number) {
   // Initialize a connection to the RPC and read in private key
   const connection = new Connection(RPC_ENDPOINT_URL, COMMITMENT);
-  const keypair = Keypair.fromSecretKey(new Uint8Array(secret));
   console.log("⚙️  endpoint:", connection.rpcEndpoint);
-  console.log("⚙️  wallet pubkey:", keypair.publicKey.toBase58());
+  console.log("⚙️  wallet pubkey:", src.publicKey.toBase58());
 
-  // devSAMO
-  // https://everlastingsong.github.io/nebula/
-  const DEV_SAMO_MINT = new PublicKey("Jd4M8bfJG3sAkd82RsGWyEXoaBXQP7njFzBwEaCTuDa");
-  const DEV_SAMO_DECIMALS = 9;
-
-  // Destination wallet for the devSAMO
-  const dest_pubkey = new PublicKey(publicKey);
-
-  // Amount to send
-  const amount = 1_000_000_000; // 1 devSAMO
+  // ORCA DEV
+  const DEV_ORCA_MINT = new PublicKey("CYmybCs3VNKwhzdVogXKWdFyjVBTwd4N3kteY95tCr6F");
+  const DEV_ORCA_DECIMALS = 18;
 
   // Obtain the associated token account from the source wallet
-  const src_token_account = await deriveATA(keypair.publicKey, DEV_SAMO_MINT);
+  const src_token_account = await deriveATA(src.publicKey, DEV_ORCA_MINT);
 
   // Obtain the associated token account for the destination wallet.
   const {address: dest_token_account, ...create_ata_ix} = await resolveOrCreateATA(
     connection,
     dest_pubkey,
-    DEV_SAMO_MINT,
+    DEV_ORCA_MINT,
     ()=>connection.getMinimumBalanceForRentExemption(AccountLayout.span),
     DecimalUtil.toU64(DecimalUtil.fromNumber(0)),
-    keypair.publicKey
+    src.publicKey
   );
 
   // Create the instruction to send devSAMO
   const transfer_ix = Token.createTransferCheckedInstruction(
     TOKEN_PROGRAM_ID,
     src_token_account,
-    DEV_SAMO_MINT,
+    DEV_ORCA_MINT,
     dest_token_account,
-    keypair.publicKey,
+    src.publicKey,
     [],
     amount,
-    DEV_SAMO_DECIMALS
+    DEV_ORCA_DECIMALS
   );
 
   // Create the transaction and add the instruction
   const tx = new Transaction();
   // Create the destination associated token account (if needed)
   create_ata_ix.instructions.map((ix) => tx.add(ix));
-  // Send devSAMO
+  // Send orca dev
   tx.add(transfer_ix);
 
   // Send the transaction
-  const signers = [keypair];
+  const signers = [src];
   const signature = await connection.sendTransaction(tx, signers);
   console.log("⚙️  signature:", signature);
 
